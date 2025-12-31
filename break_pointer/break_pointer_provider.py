@@ -30,6 +30,8 @@ __copyright__ = '(C) 2025 by gudmandras'
 
 __revision__ = '$Format:%H$'
 
+import os, inspect
+from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 from .break_pointer_algorithm import BreakPointIndexAlgorithm
 
@@ -54,8 +56,7 @@ class BreakPointIndexProvider(QgsProcessingProvider):
         Loads all algorithms belonging to this provider.
         """
         self.addAlgorithm(BreakPointIndexAlgorithm())
-        # add additional algorithms here
-        # self.addAlgorithm(MyOtherAlgorithm())
+
 
     def id(self):
         """
@@ -79,7 +80,9 @@ class BreakPointIndexProvider(QgsProcessingProvider):
         Should return a QIcon which is used for your provider inside
         the Processing toolbox.
         """
-        return QgsProcessingProvider.icon(self)
+        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
+        icon_path = os.path.join(cmd_folder, 'icons', 'icon_big.png')
+        return QIcon(icon_path)
 
     def longName(self):
         """

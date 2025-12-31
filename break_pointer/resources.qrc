@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/break_pointer/icons" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>

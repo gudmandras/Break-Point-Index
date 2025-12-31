@@ -6,6 +6,7 @@ __revision__ = '$Format:%H$'
 
 import time, os, datetime, math
 from itertools import combinations
+from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (QgsWkbTypes,
                        QgsPointXY,
@@ -44,7 +45,7 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
                                                        minValue=0, maxValue=360, defaultValue=160))
         self.addParameter(QgsProcessingParameterBoolean('InnerRings', 'Use inner rings for the index calculation',
                                                         defaultValue=True))
-        self.addParameter(QgsProcessingParameterString('NSCPField', 'NSCP field name in the result file', defaultValue='nscp_t'))
+        self.addParameter(QgsProcessingParameterString('BPIField', 'BPI field name in the result file', defaultValue='bpi'))
         self.addParameter(QgsProcessingParameterString('PerimField', 'Perimeter density field name in the result file', defaultValue='dens_perim'))
         self.addParameter(QgsProcessingParameterString('AreaDField', 'Area density field name in the result file', defaultValue='dens_area'))
         self.addParameter(QgsProcessingParameterVectorDestination('OutputLayer', 'Break Point Index point layer',
@@ -74,20 +75,37 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
     def groupId(self):
         return 'Landscape metrics'
 
+    def shortHelpString(self):
+        try:
+            with open(os.path.join(os.path.dirname(__file__), 'shorthelp.txt'), 'r',
+                      encoding='utf-8') as file:
+                return file.read()
+        except FileNotFoundError:
+            return "<html><body><p>Description file not found.</p></body></html>"
+        except Exception as e:
+            return f"<html><body><p>Error reading description file: {e}</p></body></html>"
+
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
+
+    def icon(self):
+        """
+        Returns the icon used for this specific algorithm.
+        """
+        # Get the path to your icon file
+        cmd_folder = os.path.dirname(__file__)
+        icon_path = os.path.join(cmd_folder, 'icons', 'icon_big.png')
+        return QIcon(icon_path)
 
     def createInstance(self):
         return BreakPointIndexAlgorithm()
 
     def processAlgorithm(self, parameters, context, model_feedback):
-        import ptvsd
-        ptvsd.debug_this_thread()
         results = {}
         LowerT = parameters['LowerT']
         UpperT = parameters['UpperT']
         InnerRings = parameters['InnerRings']
-        NSCPField = parameters['NSCPField']
+        BPIField = parameters['BPIField']
         PerimField = parameters['PerimField']
         AreaDField = parameters['AreaDField']
         IDField = parameters['IDField']
@@ -103,7 +121,7 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(f"Start Time: {startTime}")
         feedback.pushInfo(f"Using angle thresholds: {LowerT}° to {UpperT}°")
 
-        self.createAttributeFields(inputLayer, [NSCPField, PerimField, AreaDField], feedback)
+        self.createAttributeFields(inputLayer, [BPIField, PerimField, AreaDField], feedback)
         if feedback.isCanceled():
             return None
         feedback.pushInfo(f"Fields updated for layer: {inputLayer.name()}")
@@ -115,13 +133,13 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(f"Output point layer created: {outputLayerPath}")
         feedback.setCurrentStep(2)
 
-        data, categoryPoints = self.calculateNSCP(inputLayer, outputLayer, LowerT, UpperT, InnerRings, IDField, CatField, feedback)
+        data, categoryPoints = self.calculateBPI(inputLayer, outputLayer, LowerT, UpperT, InnerRings, IDField, CatField, feedback)
         if data is None or feedback.isCanceled():
             return None
-        feedback.pushInfo(f"NSCP calculation done!")
+        feedback.pushInfo(f"BPI calculation done!")
         feedback.setCurrentStep(3)
 
-        self.setAttributes(inputLayer, data, [NSCPField, PerimField, AreaDField])
+        self.setAttributes(inputLayer, data, [BPIField, PerimField, AreaDField])
         if feedback.isCanceled():
             return None
         feedback.pushInfo(f"Attributes set for layer: {inputLayer.name()}")
@@ -178,9 +196,7 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
         ang = abs(abs(ang2 - ang1) - 180)
         return ang, ang1, ang2
 
-    def calculateNSCP(self, inputLayer, outputLayer, LowerT, UpperT, InnerRings, IDField, CatField, feedback):
-        import ptvsd
-        ptvsd.debug_this_thread()
+    def calculateBPI(self, inputLayer, outputLayer, LowerT, UpperT, InnerRings, IDField, CatField, feedback):
         data = {}
         categoryCounts = {}
         categoryPoints = {}
@@ -253,7 +269,7 @@ class BreakPointIndexAlgorithm(QgsProcessingAlgorithm):
             processedFeatures += 1
             processedRatio = int((processedFeatures / totalFeatures) * 100)
             if processedRatio % 10 == 0:
-                feedback.pushInfo(f'NSCP calculation {str(processedRatio)} % completed')
+                feedback.pushInfo(f'BPI calculation {str(processedRatio)} % completed')
 
         return data, categoryPoints
 

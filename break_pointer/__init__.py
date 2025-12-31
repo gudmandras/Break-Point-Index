@@ -36,4 +36,4 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
     #
     from .break_pointer import BreakPointIndexPlugin
-    return BreakPointIndexPlugin()
+    return BreakPointIndexPlugin(iface)

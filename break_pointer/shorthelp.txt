@@ -1,0 +1,26 @@
+<html><body><h2>Algorithm description</h2>
+    <p>The Break Point Index (BPI) tool is designed for landscape ecological analysis of patch shape and boundary configuration. It processes polygonal landscape patches by evaluating vertex angles along patch boundaries within user-defined angular thresholds, identifying breakpoints that reflect directional changes and geometric irregularities of landscape elements. The tool generates point features representing boundary complexity and computes polygon-level BPI values together with density metrics normalized by perimeter and area. Options to include or exclude inner rings (holes) and to customize angular thresholds allow flexible assessment of landscape pattern, configuration, and shape complexity.</p>
+    <h2>Input parameters</h2>
+    <h3>Input layer</h3>
+    <p>Vector layer with polygon geometries.</p>
+    <h3>Lower tolerance</h3>
+    <p>Lower Angle Threshold (degree - °) - minimum vertex angle to consider.</p>
+    <h3>Upper tolerance</h3>
+    <p>Upper Angle Threshold (degree - °) - maximum vertex angle to consider.</p>
+    <h3>Use inner rings for the index calculation</h3>
+    <p>Include polygon holes in analysis or not.</p>
+    <h3>BPI field name in the result file</h3>
+    <p>Name of the field to store calculated Break Point Index.</p>
+    <h3>Perimeter density field name in the result file.</h3>
+    <p>Field name to store perimeter based density metric.</p>
+    <h3>Area density field name in the result file.</h3>
+    <p>Field name to store area based density metric.</p>
+    <h3>Break Point Index point layer</h3>
+    <p>Point feature class representing vertices that match angle criteria, with angle fields.</p>
+    <h3>Polygons ID field name in the result file (optional).</h3>
+    <p>Field name to store polygon identification values.</p>
+    <h3>Extra category field for shared breakpoints between category pairs, edge lenght and density (optional).</h3>
+    <p>Category field from input layer, which land cover categories for aggregated measurements.</p>
+    <h3>Output txt file.</h3>
+    <p>Textfile which stored category pairs based metrics (optional).</p>
+    <br></body></html>
